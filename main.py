@@ -1,6 +1,7 @@
 import random
 
 battlefield = [[]]
+enemy_battlefield = [[]]
 
 
 def new_game():
@@ -20,9 +21,15 @@ def ship_input():
     ships = []
     ostatok = [4, 2, 1]
     for i in range(7):
+        type_check = True
         print(f"У вас осталось: {ostatok[2]} Трехмачтовых, {ostatok[1]} Двумачтовых и {ostatok[0]} Одномачтовых кораблей\n")
-        print("Введите тип корабля который хотите разместить")
-        ship_type = input()
+        while type_check:
+            print("Введите тип корабля который хотите разместить")
+            ship_type = input()
+            if ship_type in ('1', '2', '3') and ostatok[int(ship_type)-1] != 0:
+                type_check = False
+            else:
+                print("Нет такого типа кораблей")
         if ship_type == "1":
             print("Введите координаты через пробел")
             ship_cords = input()
@@ -31,8 +38,7 @@ def ship_input():
             ship_cords = input()
             print("Введите координаты конца через пробел")
             ship_cords += " " + input()
-        ship_cords = ship_cords.split()
-        print(ship_cords)
+        ship_cords = map(int, ship_cords.split())
         ships.append(Ship(ship_type, *ship_cords))
         ostatok[int(ship_type)-1] -= 1
         show_field()
@@ -71,9 +77,7 @@ def enemy_ships():
             y1 = y0 - 2
         elif not moved:
             y1 = y0 + 2
-        e_ships.append(Ship(2, x0, y0, x1, y1))
-
-
+        e_ships.append(Ship(2, int(x0), int(y0), int(x1), int(y1)))
 
 
 def show_field():
@@ -113,14 +117,51 @@ class Ship:
     """
 
     def __init__(self, ship_type, x0, y0, x1=0, y1=0):
-        cords_begin = x0, y0
-        cords_end = x1, y1
+        parts = [[]]  # Части корабля
+        space = []  # Пространство между кораблями
         size = ship_type
+        health = int(size)
+        if size == '3':
+            parts = [[x0, y0], [int(x0+x1)//2, int(y0+y1)//2], [x1, y1]]
+        elif size == '2':
+            parts = [[x0, y0], [x1, y1]]
+        else:
+            print(1)
+            parts = [[x0, y0]]
+        for i in range(len(parts)):
+            delta_y = -2
+            for j in range(3):
+                delta_x = -1
+                delta_y += 1
+                for k in range(3):
+                    space.append([int(parts[i][0])+delta_x, int(parts[i][1])+delta_y])
+                    delta_x += 1
+
+    def hit(self, x, y):
+        if [x, y] in self.get_parts:
+            self.health -= 1
+            if self.health == 0:
+                return "Убил"
+            else:
+                return "Ранил"
+        else:
+            return "Мимо"
 
     @property
-    def get_cords(self):
-        return self.cords_begin, self.cords_end
+    def get_parts(self):
+        """
+        Возвращает координаты частей корабля
+        :return:
+        """
+        return self.parts
 
+    @property
+    def get_space(self):
+        """
+        Возвращает координаты пространства между кораблями
+        :return:
+        """
+        return self.space
 
     @property
     def get_type(self):
