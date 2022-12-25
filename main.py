@@ -22,11 +22,12 @@ def ship_input():
     ostatok = [4, 2, 1]
     for i in range(7):
         type_check = True
-        print(f"У вас осталось: {ostatok[2]} Трехмачтовых, {ostatok[1]} Двумачтовых и {ostatok[0]} Одномачтовых кораблей\n")
+        print(
+            f"У вас осталось: {ostatok[2]} Трехмачтовых, {ostatok[1]} Двумачтовых и {ostatok[0]} Одномачтовых кораблей\n")
         while type_check:
             print("Введите тип корабля который хотите разместить")
             ship_type = input()
-            if ship_type in ('1', '2', '3') and ostatok[int(ship_type)-1] != 0:
+            if ship_type in ('1', '2', '3') and ostatok[int(ship_type) - 1] != 0:
                 type_check = False
             else:
                 print("Нет такого типа кораблей")
@@ -40,7 +41,7 @@ def ship_input():
             ship_cords += " " + input()
         ship_cords = map(int, ship_cords.split())
         ships.append(Ship(ship_type, *ship_cords))
-        ostatok[int(ship_type)-1] -= 1
+        ostatok[int(ship_type) - 1] -= 1
         show_field()
 
 
@@ -53,31 +54,46 @@ def enemy_ships():
     e_ships.clear()
     x0 = random.randint(0, 5)
     if x0 > 4:
-        x1 = x0-2
+        x1 = x0 - 2
         moved = True
     elif x0 < 3:
-        x1 = x0+2
+        x1 = x0 + 2
         moved = True
     y0 = random.randint(0, 5)
     if y0 >= 3 and not moved:
-        y1 = y0-2
+        y1 = y0 - 2
     elif not moved:
-        y1 = y0+2
+        y1 = y0 + 2
     e_ships.append(Ship(3, x0, y0, x1, y1))
     for i in range(2):
-        x0 = random.randint(0, 5)
-        y0 = random.randint(0, 5)
-        if x0 > 3:
-            x1 = x0 - 2
-            moved = True
-        elif x0 < 2:
-            x1 = x0 + 2
-            moved = True
-        if y0 >= 2 and not moved:
-            y1 = y0 - 2
-        elif not moved:
-            y1 = y0 + 2
+        space_check = True
+        while space_check:
+            x0 = random.randint(0, 5)
+            y0 = random.randint(0, 5)
+            if x0 > 3:
+                x1 = x0 - 2
+                moved = True
+            elif x0 < 2:
+                x1 = x0 + 2
+                moved = True
+            if y0 >= 2 and not moved:
+                y1 = y0 - 2
+            elif not moved:
+                y1 = y0 + 2
+            for i in range(len(e_ships)):
+                if [x0, y0] not in e_ships[i].get_parts or [x0, y0] not in e_ships[i].get_space or\
+                        [x1, y1] not in e_ships[i].get_parts or [x1, y1] not in e_ships[i].get_space:
+                    space_check = False
         e_ships.append(Ship(2, int(x0), int(y0), int(x1), int(y1)))
+    for i in range(2):
+        space_check = True
+        while space_check:
+            x0 = random.randint(0, 5)
+            y0 = random.randint(0, 5)
+            for i in range(len(e_ships)):
+                if [x0, y0] not in e_ships[i].get_parts or [x0, y0] not in e_ships[i].get_space:
+                    space_check = False
+        e_ships.append(1, int(x0), int(y0))
 
 
 def show_field():
@@ -87,7 +103,7 @@ def show_field():
     print("  | 1 | 2 | 3 | 4 | 5 | 6 |")
     for i in range(6):
         stroka = ''
-        stroka += f"{i+1} |"
+        stroka += f"{i + 1} |"
         for j in range(6):
             stroka += f' {battlefield[i][j]} |'
         print(stroka)
@@ -122,7 +138,7 @@ class Ship:
         size = ship_type
         health = int(size)
         if size == '3':
-            parts = [[x0, y0], [int(x0+x1)//2, int(y0+y1)//2], [x1, y1]]
+            parts = [[x0, y0], [int(x0 + x1) // 2, int(y0 + y1) // 2], [x1, y1]]
         elif size == '2':
             parts = [[x0, y0], [x1, y1]]
         else:
@@ -134,7 +150,7 @@ class Ship:
                 delta_x = -1
                 delta_y += 1
                 for k in range(3):
-                    space.append([int(parts[i][0])+delta_x, int(parts[i][1])+delta_y])
+                    space.append([int(parts[i][0]) + delta_x, int(parts[i][1]) + delta_y])
                     delta_x += 1
 
     def hit(self, x, y):
@@ -146,6 +162,13 @@ class Ship:
                 return "Ранил"
         else:
             return "Мимо"
+
+    @property
+    def is_alive(self):
+        if self.health == 0:
+            return False
+        else:
+            return True
 
     @property
     def get_parts(self):
@@ -172,4 +195,3 @@ class Ship:
 ■
 '''
 new_game()
-
