@@ -26,7 +26,7 @@ def ship_input():
         cords_check = True
         while type_check:
             print(
-            f"У вас осталось: {ostatok[2]} Трехмачтовых, {ostatok[1]} Двумачтовых и {ostatok[0]} Одномачтовых кораблей")
+            f"У вас осталось: {ostatok[2]} Трехмачтовых (3), {ostatok[1]} Двумачтовых (2) и {ostatok[0]} Одномачтовых кораблей (1)")
             print("Введите тип корабля который хотите разместить")
             ship_type = input()
             if ship_type in ('1', '2', '3') and ostatok[int(ship_type) - 1] != 0:
@@ -37,20 +37,36 @@ def ship_input():
             if ship_type == "1":
                 print("Введите координаты через пробел")
                 ship_cords = input()
-                cords0 = map(int, ship_cords.split())
+                cords0 = list(map(int, ship_cords.split()))
                 cords1 = cords0
             else:
                 print("Введите координаты начала через пробел")
                 ship_cords = input()
-                cords0 = map(int, ship_cords.split())
+                try:
+                    cords0 = list(map(int, ship_cords.split()))
+                except ValueError:
+                    print("!!!Неверный формат ввода!!!")
+                    continue
                 print("Введите координаты конца через пробел")
                 ship_cords = input()
-                cords1 = map(int, ship_cords.split())
+                try:
+                    cords1 = list(map(int, ship_cords.split()))
+                except ValueError:
+                    print("!!!Неверный формат ввода!!!")
+                    continue
+                if ((int(abs(cords0[0]-cords1[0])) != int(ship_type)-1)
+                        and (int((abs(cords0[1]-cords1[1])) != int(ship_type)-1)))\
+                        or (cords1[0] not in range(1, 7)) or (cords1[1] not in range(1, 7))\
+                        or (cords0[0] not in range(1, 7)) or (cords0[1] not in range(1, 7))\
+                        or all([cords0[0]-cords1[0] != 0, cords0[1]-cords1[1] != 0]):
+                    print("!!!Неверно указаны координаты!!!")
+                    continue
             if len(ships) == 0:
                 cords_check = False
             for j in range(len(ships)):
                 if cords0 in ships[j].get_space or cords1 in ships[j].get_space \
                         or cords0 in ships[j].get_parts or cords1 in ships[j].get_parts:
+                    show_field(ships)
                     print("!!!корабль не вмещается, попробуйте другое место!!!")
                 else:
                     cords_check = False
@@ -122,12 +138,12 @@ def show_field(ships=[]):
             for j in range(len(cords.get_space)):
                 cord_x = int(cords.get_space[j][0]) - 1
                 cord_y = int(cords.get_space[j][1]) - 1
-                if cord_x >= 0 and cord_y >= 0:
+                if cord_x in range(0, 6) and cord_y in range(0, 6):
                     battlefield[cord_x][cord_y] = '●'
             for j in range(len(cords.get_parts)):
                 cord_x = int(cords.get_parts[j][0]) - 1
                 cord_y = int(cords.get_parts[j][1]) - 1
-                if cord_x >=0 and cord_y >= 0:
+                if cord_x in range(0, 6) and cord_y in range(0, 6):
                     battlefield[cord_x][cord_y] = '■'
     for i in range(6):
         stroka = ''
