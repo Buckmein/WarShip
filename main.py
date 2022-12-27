@@ -83,48 +83,62 @@ def enemy_ships():
     """
     e_ships = []
     e_ships.clear()
-    x0 = random.randint(0, 5)
+    moved = False
+    x0 = random.randint(1, 6)
     if x0 > 4:
         x1 = x0 - 2
         moved = True
     elif x0 < 3:
         x1 = x0 + 2
         moved = True
-    y0 = random.randint(0, 5)
+    else:
+        x1 = x0
+        moved = False
+    y0 = random.randint(1, 6)
     if y0 >= 3 and not moved:
         y1 = y0 - 2
     elif not moved:
         y1 = y0 + 2
-    e_ships.append(Ship(3, x0, y0, x1, y1))
+    else:
+        y1 = y0
+    e_ships.append(Ship(3, int(x0), int(y0), int(x1), int(y1)))
     for i in range(2):
         space_check = True
         while space_check:
-            x0 = random.randint(0, 5)
-            y0 = random.randint(0, 5)
+            x0 = random.randint(1, 6)
+            y0 = random.randint(1, 6)
             if x0 > 3:
                 x1 = x0 - 2
                 moved = True
             elif x0 < 2:
                 x1 = x0 + 2
                 moved = True
+            else:
+                x1 = x0
+                moved = False
             if y0 >= 2 and not moved:
                 y1 = y0 - 2
             elif not moved:
                 y1 = y0 + 2
-            for i in range(len(e_ships)):
-                if [x0, y0] not in e_ships[i].get_parts or [x0, y0] not in e_ships[i].get_space or \
-                        [x1, y1] not in e_ships[i].get_parts or [x1, y1] not in e_ships[i].get_space:
+            else:
+                y1 = y0
+            for j in range(len(e_ships)):
+                if ([x0, y0] not in e_ships[j].get_parts) or ([x0, y0] not in e_ships[j].get_space)\
+                        or ([x1, y1] not in e_ships[j].get_parts) or ([x1, y1] not in e_ships[j].get_space):
                     space_check = False
         e_ships.append(Ship(2, int(x0), int(y0), int(x1), int(y1)))
-    for i in range(2):
+    for i in range(4):
         space_check = True
         while space_check:
-            x0 = random.randint(0, 5)
-            y0 = random.randint(0, 5)
-            for i in range(len(e_ships)):
-                if [x0, y0] not in e_ships[i].get_parts or [x0, y0] not in e_ships[i].get_space:
+            x0 = random.randint(1, 6)
+            x1 = x0
+            y0 = random.randint(1, 6)
+            y1 = y0
+            for j in range(len(e_ships)):
+                if ([x0, y0] not in e_ships[j].get_parts) or ([x0, y0] not in e_ships[j].get_space):
                     space_check = False
-        e_ships.append(1, int(x0), int(y0))
+        e_ships.append(Ship(1, int(x0), int(y0), int(x1), int(y1)))
+    show_field(e_ships)
 
 
 def show_field(ships=[]):
@@ -181,12 +195,11 @@ class Ship:
         self.space = []  # Пространство между кораблями
         self.size = ship_type
         self.health = int(self.size)
-        if self.size == '3':
+        if self.size in ('3', 3):
             self.parts = [[x0, y0], [int(x0 + x1) // 2, int(y0 + y1) // 2], [x1, y1]]
-        elif self.size == '2':
+        elif self.size in ('2', 2):
             self.parts = [[x0, y0], [x1, y1]]
         else:
-            print(1)
             self.parts = [[x0, y0]]
         for i in range(len(self.parts)):
             delta_y = -2
@@ -238,4 +251,6 @@ class Ship:
 '''
 ■  ◉ ◯
 '''
+enemy_ships()
+show_field()
 new_game()
