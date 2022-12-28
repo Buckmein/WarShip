@@ -306,3 +306,6 @@ class Ship:
 
 new_game()
 
+for i in range(10):
+    clear_field()
+    enemy_ships()
