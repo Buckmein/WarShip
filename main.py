@@ -104,10 +104,11 @@ def enemy_ships():
     e_ships.append(Ship(3, int(x0), int(y0), int(x1), int(y1)))
     for i in range(2):
         space_check = True
+        space_check1 = False
         while space_check:
             x0 = random.randint(1, 6)
             y0 = random.randint(1, 6)
-            if x0 > 3:
+            if x0 > 5:
                 x1 = x0 - 2
                 moved = True
             elif x0 < 2:
@@ -118,25 +119,32 @@ def enemy_ships():
                 moved = False
             if y0 >= 2 and not moved:
                 y1 = y0 - 2
-            elif not moved:
+            elif not moved and y0 < 3:
                 y1 = y0 + 2
             else:
                 y1 = y0
             for j in range(len(e_ships)):
-                if ([x0, y0] not in e_ships[j].get_parts) or ([x0, y0] not in e_ships[j].get_space)\
-                        or ([x1, y1] not in e_ships[j].get_parts) or ([x1, y1] not in e_ships[j].get_space):
+                if ([x0, y0] not in e_ships[j].get_parts) and ([x0, y0] not in e_ships[j].get_space)\
+                        and ([x1, y1] not in e_ships[j].get_parts) and ([x1, y1] not in e_ships[j].get_space):
                     space_check = False
+                else:
+                    space_check1 = True
+            space_check = space_check1 or space_check
         e_ships.append(Ship(2, int(x0), int(y0), int(x1), int(y1)))
     for i in range(4):
         space_check = True
+        space_check1 = False
         while space_check:
             x0 = random.randint(1, 6)
             x1 = x0
             y0 = random.randint(1, 6)
             y1 = y0
             for j in range(len(e_ships)):
-                if ([x0, y0] not in e_ships[j].get_parts) or ([x0, y0] not in e_ships[j].get_space):
+                if ([x0, y0] not in e_ships[j].get_parts) and ([x0, y0] not in e_ships[j].get_space):
                     space_check = False
+                else:
+                    space_check1 = True
+            space_check = space_check1 or space_check
         e_ships.append(Ship(1, int(x0), int(y0), int(x1), int(y1)))
     show_field(e_ships)
 
@@ -146,19 +154,18 @@ def show_field(ships=[]):
     Функциявывода поля на экран
     """
     print("  | 1 | 2 | 3 | 4 | 5 | 6 |")
-    if ships != 0:
-        for i in range(len(ships)):
-            cords = ships[i]
-            for j in range(len(cords.get_space)):
-                cord_x = int(cords.get_space[j][0]) - 1
-                cord_y = int(cords.get_space[j][1]) - 1
-                if cord_x in range(0, 6) and cord_y in range(0, 6):
-                    battlefield[cord_x][cord_y] = '●'
-            for j in range(len(cords.get_parts)):
-                cord_x = int(cords.get_parts[j][0]) - 1
-                cord_y = int(cords.get_parts[j][1]) - 1
-                if cord_x in range(0, 6) and cord_y in range(0, 6):
-                    battlefield[cord_x][cord_y] = '■'
+    for i in range(len(ships)):
+        cords = ships[i]
+        for j in range(len(cords.get_space)):
+            cord_x = int(cords.get_space[j][0]) - 1
+            cord_y = int(cords.get_space[j][1]) - 1
+            if cord_x in range(0, 6) and cord_y in range(0, 6):
+                battlefield[cord_x][cord_y] = '●'
+        for j in range(len(cords.get_parts)):
+            cord_x = int(cords.get_parts[j][0]) - 1
+            cord_y = int(cords.get_parts[j][1]) - 1
+            if cord_x in range(0, 6) and cord_y in range(0, 6):
+                battlefield[cord_x][cord_y] = '■'
     for i in range(6):
         stroka = ''
         stroka += f"{i + 1} |"
@@ -209,6 +216,10 @@ class Ship:
                 for k in range(3):
                     self.space.append([int(self.parts[i][0]) + delta_x, int(self.parts[i][1]) + delta_y])
                     delta_x += 1
+        for j in range(self.size):
+            for i in self.space:
+                if (self.space.count(i) > 1) or (i[0] > 5) or (i[1] > 5):
+                    self.space.remove(i)
 
     def hit(self, x, y):
         if [x, y] in self.get_parts:
@@ -251,6 +262,7 @@ class Ship:
 '''
 ■  ◉ ◯
 '''
+clear_field()
 enemy_ships()
-show_field()
-new_game()
+#show_field()
+#new_game()
