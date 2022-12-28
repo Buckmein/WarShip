@@ -84,6 +84,7 @@ def enemy_ships():
     e_ships = []
     e_ships.clear()
     moved = False
+    tries = 0
     x0 = random.randint(1, 6)
     if x0 > 4:
         x1 = x0 - 2
@@ -104,23 +105,23 @@ def enemy_ships():
     e_ships.append(Ship(3, int(x0), int(y0), int(x1), int(y1)))
     for i in range(2):
         space_check = True
-        space_check1 = False
         while space_check:
+            space_check1 = False
             x0 = random.randint(1, 6)
             y0 = random.randint(1, 6)
-            if x0 > 5:
-                x1 = x0 - 2
+            if x0 > 3:
+                x1 = x0 - 1
                 moved = True
             elif x0 < 2:
-                x1 = x0 + 2
+                x1 = x0 + 1
                 moved = True
             else:
                 x1 = x0
                 moved = False
-            if y0 >= 2 and not moved:
-                y1 = y0 - 2
+            if y0 > 4 and not moved:
+                y1 = y0 - 1
             elif not moved and y0 < 3:
-                y1 = y0 + 2
+                y1 = y0 + 1
             else:
                 y1 = y0
             for j in range(len(e_ships)):
@@ -133,8 +134,8 @@ def enemy_ships():
         e_ships.append(Ship(2, int(x0), int(y0), int(x1), int(y1)))
     for i in range(4):
         space_check = True
-        space_check1 = False
         while space_check:
+            space_check1 = False
             x0 = random.randint(1, 6)
             x1 = x0
             y0 = random.randint(1, 6)
@@ -172,6 +173,7 @@ def show_field(ships=[]):
         for j in range(6):
             stroka += f' {battlefield[i][j]} |'
         print(stroka)
+    print('*******************')
 
 
 def clear_field():
@@ -218,7 +220,7 @@ class Ship:
                     delta_x += 1
         for j in range(self.size):
             for i in self.space:
-                if (self.space.count(i) > 1) or (i[0] > 5) or (i[1] > 5):
+                if (self.space.count(i) > 1) or (i[0] > 6) or (i[1] > 6):
                     self.space.remove(i)
 
     def hit(self, x, y):
@@ -262,7 +264,9 @@ class Ship:
 '''
 ■  ◉ ◯
 '''
-clear_field()
-enemy_ships()
-#show_field()
+
 #new_game()
+
+for i in range(10):
+    clear_field()
+    enemy_ships()
