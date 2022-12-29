@@ -321,22 +321,25 @@ def enemy_turn():
         shot_x = random.randint(1, 6)
         shot_y = random.randint(1, 6)
         for i in ships:
-            if i.hit(shot_x, shot_y):
-                if i.is_alive:
-                    show_field(ships)
-                    print(shot_x, shot_y)
-                    print("Ваш корабль подбит")
-                    show_field(ships)
-                    return enemy_turn()
+            if [shot_x, shot_y] not in i.dead_cells:
+                if i.hit(shot_x, shot_y):
+                    if i.is_alive:
+                        show_field(ships)
+                        print(shot_x, shot_y)
+                        print("Ваш корабль подбит")
+                        show_field(ships)
+                        return enemy_turn()
 
-                else:
-                    show_field(ships)
-                    print(shot_x, shot_y)
-                    print("Ваш корабль пошел ко дну")
-                    return enemy_turn()
+                    else:
+                        show_field(ships)
+                        print(shot_x, shot_y)
+                        print("Ваш корабль пошел ко дну")
+                        return enemy_turn()
             else:
                 print("Противник промахнулся)))")
                 return False
+        else:
+            return enemy_turn()
 
 
 class Ship:
