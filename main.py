@@ -6,12 +6,24 @@ ships = []
 e_ships = []
 
 
+class Dot:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def __eq__(self, other):
+        return self.x == other.x and self.y == other.y
+
+    def __repr__(self):
+        return f"({self.x}, {self.y})"
+
+
 class Ship:
     """
     Класс создания кораблей хранит жизни, координатны корабля и пустого пространства вокруг,
     """
 
-    def __init__(self, ship_type, x0, y0, x1=0, y1=0):
+    def __init__(self, ship_type, dot1, dot2):
         self.parts = []  # Части корабля
         self.space = []  # Пространство между кораблями
         self.dead_cells = []  # Подбитые ячейки корабля
@@ -35,9 +47,9 @@ class Ship:
                 if (self.space.count(si) > 1) or (si[0] > 6) or (si[1] > 6):
                     self.space.remove(si)
 
-    def hit(self, x, y):
-        if [x, y] in self.get_parts:
-            self.dead_cells.append([x, y])
+    def hit(self, dot):
+        if dot in self.get_parts:
+            self.dead_cells.append(dot)
             return True
         else:
             return False
@@ -419,7 +431,6 @@ def new_game():
     enemy_input()
     show_field()
     ship_input()
-    show_field()
     game()
 
 
