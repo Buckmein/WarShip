@@ -83,7 +83,7 @@ def ship_input():
     if rand == 'n':
         while ok:
             ships = rand_ships()
-            show_field(ships)
+            show_field()
             print("Если поле осталось пустым перерасположите корабли")
             print("Играем или расположить корабли подругому?  y - Играем, n - Расположить по-другому")
             if input() != 'n':
@@ -139,7 +139,7 @@ def ship_input():
                 for j in range(len(ships)):
                     if cords0 in ships[j].get_space or cords1 in ships[j].get_space \
                             or cords0 in ships[j].get_parts or cords1 in ships[j].get_parts:
-                        show_field(ships)
+                        show_field()
                         print("!!!корабль не вмещается, попробуйте другое место!!!")
                         break
                     else:
@@ -235,66 +235,64 @@ def rand_ships():
     return side
 
 
-def show_field(ships1=None, enemy=False):
+def show_field():
     """
     Функция вывода поля на экран
     """
     clear_field()
-    if ships1 is None:
-        ships1 = []
-    print("  | 1 | 2 | 3 | 4 | 5 | 6 |")
-    if enemy:
-        for si in range(len(ships1)):
-            cords = ships1[si]
-            if cords.is_alive:
-                pass
-            else:
-                for j in range(len(cords.get_space)):
-                    cord_x = int(cords.get_space[j][0]) - 1
-                    cord_y = int(cords.get_space[j][1]) - 1
-                    if cord_x in range(0, 6) and cord_y in range(0, 6):
-                        battlefield[cord_x][cord_y] = '◦'
-            for j in range(len(cords.dead_cells)):
-                cord_x = int(cords.dead_cells[j][0]) - 1
-                cord_y = int(cords.dead_cells[j][1]) - 1
-                try:
-                    if cord_x in range(0, 6) and cord_y in range(0, 6):
-                        battlefield[cord_x][cord_y] = '╳'
-                except IndexError:
-                    print(cord_x, cord_y)
-    else:
-        for si in range(len(ships1)):
-            cords = ships1[si]
+    print("        Ваши корабли                     Корабли противника   ")
+    print("  | 1 | 2 | 3 | 4 | 5 | 6 |          | 1 | 2 | 3 | 4 | 5 | 6 |")
+    for si in range(len(e_ships)):
+        cords = e_ships[si]
+        if cords.is_alive:
+            pass
+        else:
             for j in range(len(cords.get_space)):
                 cord_x = int(cords.get_space[j][0]) - 1
                 cord_y = int(cords.get_space[j][1]) - 1
-                try:
-                    if cord_x in range(0, 6) and cord_y in range(0, 6):
-                        battlefield[cord_x][cord_y] = '◦'
-                except IndexError:
-                    print(cord_x, cord_y)
-            for j in range(len(cords.get_parts)):
-                cord_x = int(cords.get_parts[j][0]) - 1
-                cord_y = int(cords.get_parts[j][1]) - 1
-                try:
-                    if cord_x in range(0, 6) and cord_y in range(0, 6):
-                        battlefield[cord_x][cord_y] = '■'
-                except IndexError:
-                    print(cord_x, cord_y)
-            for j in range(len(cords.dead_cells)):
-                cord_x = int(cords.dead_cells[j][0]) - 1
-                cord_y = int(cords.dead_cells[j][1]) - 1
-                try:
-                    if cord_x in range(0, 6) and cord_y in range(0, 6):
-                        battlefield[cord_x][cord_y] = '╳'
-                except IndexError:
-                    print(cord_x, cord_y)
+                if cord_x in range(0, 6) and cord_y in range(0, 6):
+                    enemy_battlefield[cord_x][cord_y] = '◦'
+        for j in range(len(cords.dead_cells)):
+            cord_x = int(cords.dead_cells[j][0]) - 1
+            cord_y = int(cords.dead_cells[j][1]) - 1
+            try:
+                if cord_x in range(0, 6) and cord_y in range(0, 6):
+                    enemy_battlefield[cord_x][cord_y] = '╳'
+            except IndexError:
+                print(cord_x, cord_y)
+    for si in range(len(ships)):
+        cords = ships[si]
+        for j in range(len(cords.get_space)):
+            cord_x = int(cords.get_space[j][0]) - 1
+            cord_y = int(cords.get_space[j][1]) - 1
+            try:
+                if cord_x in range(0, 6) and cord_y in range(0, 6):
+                    battlefield[cord_x][cord_y] = '◦'
+            except IndexError:
+                print(cord_x, cord_y)
+        for j in range(len(cords.get_parts)):
+            cord_x = int(cords.get_parts[j][0]) - 1
+            cord_y = int(cords.get_parts[j][1]) - 1
+            try:
+                if cord_x in range(0, 6) and cord_y in range(0, 6):
+                    battlefield[cord_x][cord_y] = '■'
+            except IndexError:
+                print(cord_x, cord_y)
+        for j in range(len(cords.dead_cells)):
+            cord_x = int(cords.dead_cells[j][0]) - 1
+            cord_y = int(cords.dead_cells[j][1]) - 1
+            try:
+                if cord_x in range(0, 6) and cord_y in range(0, 6):
+                    battlefield[cord_x][cord_y] = '╳'
+            except IndexError:
+                print(cord_x, cord_y)
     for si in range(6):
-        stroka = ''
-        stroka += f"{si + 1} |"
+        stroka1 = f"       {si + 1} |"
+        stroka = f"{si + 1} |"
         for j in range(6):
             stroka += f' {battlefield[si][j]} |'
-        print(stroka)
+            stroka1 += f' {enemy_battlefield[si][j]} |'
+        print(stroka,stroka1)
     print('*******************')
 
 
@@ -303,10 +301,13 @@ def clear_field():
     Функция очистки игрового поля
     """
     battlefield.clear()
+    enemy_battlefield.clear()
     for si in range(6):
         battlefield.append([])
+        enemy_battlefield.append(([]))
         for j in range(6):
             battlefield[si].append('◯')
+            enemy_battlefield[si].append('◯')
 
 
 def game():
@@ -317,12 +318,12 @@ def game():
     step = 0
     end = False
     while not end:
-        step += 1
         if not step % 2:
-            show_field(e_ships, enemy=True)
+            show_field()
             end = player_turn()
         else:
             end = enemy_turn()
+        step += 1
 
     new_game()
 
@@ -353,17 +354,17 @@ def player_turn():
                     if i.hit(*shot):
                         if i.is_alive:
                             print("Ранил!!!")
-                            show_field(e_ships, True)
+                            show_field()
                             player_turn()
                             return False
                         else:
-                            show_field(e_ships, True)
+                            show_field()
                             print("Убил!!!")
                             player_turn()
                             return False
-                else:
-                    print("Промах(((")
-                    return False
+                    else:
+                        print("Промах(((")
+                        return False
         except TypeError:
             print("Ошибка ввода")
             return player_turn()
@@ -387,18 +388,19 @@ def enemy_turn():
             if [shot_x, shot_y] not in i.dead_cells:
                 if i.hit(shot_x, shot_y):
                     if i.is_alive:
-                        show_field(ships)
+                        show_field()
                         print(shot_x, shot_y)
                         print("Ваш корабль подбит")
-                        show_field(ships)
+                        show_field()
                         return enemy_turn()
 
                     else:
-                        show_field(ships)
+                        show_field()
                         print(shot_x, shot_y)
                         print("Ваш корабль пошел ко дну")
                         return enemy_turn()
             else:
+                print(shot_x, shot_y)
                 print("Противник промахнулся)))")
                 return False
         else:
@@ -414,10 +416,10 @@ def new_game():
     """
     Функция начала новой игры
     """
+    enemy_input()
     show_field()
     ship_input()
-    enemy_input()
-    show_field(e_ships)
+    show_field()
     game()
 
 
