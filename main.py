@@ -6,6 +6,70 @@ ships = []
 e_ships = []
 
 
+class Ship:
+    """
+    Класс создания кораблей хранит жизни, координатны корабля и пустого пространства вокруг,
+    """
+
+    def __init__(self, ship_type, x0, y0, x1=0, y1=0):
+        self.parts = []  # Части корабля
+        self.space = []  # Пространство между кораблями
+        self.dead_cells = []  # Подбитые ячейки корабля
+        self.size = ship_type
+        if self.size in ('3', 3):
+            self.parts = [[x0, y0], [int(x0 + x1) // 2, int(y0 + y1) // 2], [x1, y1]]
+        elif self.size in ('2', 2):
+            self.parts = [[x0, y0], [x1, y1]]
+        else:
+            self.parts = [[x0, y0]]
+        for si in range(len(self.parts)):
+            delta_y = -2
+            for j in range(3):
+                delta_x = -1
+                delta_y += 1
+                for k in range(3):
+                    self.space.append([int(self.parts[si][0]) + delta_x, int(self.parts[si][1]) + delta_y])
+                    delta_x += 1
+        for j in range(self.size):
+            for si in self.space:
+                if (self.space.count(si) > 1) or (si[0] > 6) or (si[1] > 6):
+                    self.space.remove(si)
+
+    def hit(self, x, y):
+        if [x, y] in self.get_parts:
+            self.dead_cells.append([x, y])
+            return True
+        else:
+            return False
+
+    @property
+    def is_alive(self):
+        if len(self.dead_cells) == self.size:
+            return False
+        else:
+            return True
+
+    @property
+    def get_parts(self):
+        """
+        Возвращает координаты частей корабля
+        :return:
+        """
+        return self.parts
+
+    @property
+    def get_space(self):
+        """
+        Возвращает координаты пространства между кораблями
+        :return:
+        """
+        return self.space
+
+    @property
+    def get_type(self):
+        return self.size
+
+
 def ship_input():
     """
     Ввод кораблей игрока
@@ -275,7 +339,6 @@ def player_turn():
         print("Вы победили!!!!")
         return win
     else:
-        shot = ''  # Координаты выстрела
         try:
             print("Ваш ход, введите координаты залпа через пробел:")
             shot = input()
@@ -321,86 +384,25 @@ def enemy_turn():
         shot_x = random.randint(1, 6)
         shot_y = random.randint(1, 6)
         for i in ships:
-            if i.hit(shot_x, shot_y):
-                if i.is_alive:
-                    show_field(ships)
-                    print(shot_x, shot_y)
-                    print("Ваш корабль подбит")
-                    show_field(ships)
-                    return enemy_turn()
+            if [shot_x, shot_y] not in i.dead_cells:
+                if i.hit(shot_x, shot_y):
+                    if i.is_alive:
+                        show_field(ships)
+                        print(shot_x, shot_y)
+                        print("Ваш корабль подбит")
+                        show_field(ships)
+                        return enemy_turn()
 
-                else:
-                    show_field(ships)
-                    print(shot_x, shot_y)
-                    print("Ваш корабль пошел ко дну")
-                    return enemy_turn()
+                    else:
+                        show_field(ships)
+                        print(shot_x, shot_y)
+                        print("Ваш корабль пошел ко дну")
+                        return enemy_turn()
             else:
                 print("Противник промахнулся)))")
                 return False
-
-
-class Ship:
-    """
-    Класс создания кораблей хранит жизни, координатны корабля и пустого пространства вокруг,
-    """
-
-    def __init__(self, ship_type, x0, y0, x1=0, y1=0):
-        self.parts = []  # Части корабля
-        self.space = []  # Пространство между кораблями
-        self.dead_cells = []  # Подбитые ячейки корабля
-        self.size = ship_type
-        if self.size in ('3', 3):
-            self.parts = [[x0, y0], [int(x0 + x1) // 2, int(y0 + y1) // 2], [x1, y1]]
-        elif self.size in ('2', 2):
-            self.parts = [[x0, y0], [x1, y1]]
         else:
-            self.parts = [[x0, y0]]
-        for si in range(len(self.parts)):
-            delta_y = -2
-            for j in range(3):
-                delta_x = -1
-                delta_y += 1
-                for k in range(3):
-                    self.space.append([int(self.parts[si][0]) + delta_x, int(self.parts[si][1]) + delta_y])
-                    delta_x += 1
-        for j in range(self.size):
-            for si in self.space:
-                if (self.space.count(si) > 1) or (si[0] > 6) or (si[1] > 6):
-                    self.space.remove(si)
-
-    def hit(self, x, y):
-        if [x, y] in self.get_parts:
-            self.dead_cells.append([x, y])
-            return True
-        else:
-            return False
-
-    @property
-    def is_alive(self):
-        if len(self.dead_cells) == self.size:
-            return False
-        else:
-            return True
-
-    @property
-    def get_parts(self):
-        """
-        Возвращает координаты частей корабля
-        :return:
-        """
-        return self.parts
-
-    @property
-    def get_space(self):
-        """
-        Возвращает координаты пространства между кораблями
-        :return:
-        """
-        return self.space
-
-    @property
-    def get_type(self):
-        return self.size
+            return enemy_turn()
 
 
 '''
@@ -415,6 +417,7 @@ def new_game():
     show_field()
     ship_input()
     enemy_input()
+    show_field(e_ships)
     game()
 
 
